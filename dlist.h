@@ -59,6 +59,14 @@ space complexity: O(1)
 */
 void dlist_insert(struct dlist *list, const void *data, size_t index);
 
+/*
+dlist_append(list, data)
+
+append 'data' into the tail of the doubly linked list
+
+time complexity: O(1)
+space complexity: O(1)
+*/
 #define dlist_append(list, data) dlist_insert((list), (data), ((list)->len))
 
 /*
