@@ -59,6 +59,8 @@ space complexity: O(1)
 */
 void dlist_insert(struct dlist *list, const void *data, size_t index);
 
+#define dlist_append(list, data) dlist_insert((list), (data), ((list)->len))
+
 /*
 dlist_at(struct dlist *list, size_t index)
 
