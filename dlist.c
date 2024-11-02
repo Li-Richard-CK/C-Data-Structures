@@ -146,6 +146,15 @@ ret:
     ++list->len;
 }
 
+/*
+dlist_free(struct dlist *list)
+
+free memory allocated by the doubly linked list
+traverse the list while freeing the memory
+
+time complexity: O(n)
+space complexity: O(1)
+*/
 void dlist_free(struct dlist *list)
 {
     struct dlist_node *cur, *next;
