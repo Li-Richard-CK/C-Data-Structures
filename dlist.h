@@ -18,6 +18,6 @@ typedef struct dlist
     } mm;
 } dlist_t;
 
-struct dlist dlist_create(...);
+struct dlist dlist_create();
 
 #endif

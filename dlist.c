@@ -10,7 +10,7 @@ struct dlist_node
     size_t index;
 };
 
-struct dlist dlist_create(...)
+struct dlist dlist_create()
 {
     struct dlist new_list;
 
@@ -18,5 +18,10 @@ struct dlist dlist_create(...)
     new_list.head = NULL;
     new_list.tail = NULL;
 
-        return new_list;
+    new_list.cmp_f = NULL;
+
+    new_list.mm.alloc_f = NULL;
+    new_list.mm.free_f = NULL;
+
+    return new_list;
 }
