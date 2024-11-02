@@ -112,61 +112,79 @@ void dlist_insert(struct dlist *list, const void *data, size_t index)
         return;
     }
 
-    if (index > list->len)
-        index = list->len;
-
     struct dlist_node *new_node = _create_node(list->mm.alloc_f, data);
     if (!new_node)
     {
         fprintf(stderr, "Failed to create new dlist node.\n");
         return;
     }
+
+    if (index > list->len)
+        index = list->len;
+
     new_node->index = index;
 
-    if (list->head == NULL)
+    if (!list->head)
     {
         list->head = new_node;
         list->tail = new_node;
-        goto ret;
     }
-
-    if (index == list->len)
+    else if (index == 0)
     {
+        new_node->next = list->head;
+        list->head->prev = new_node;
+        list->head = new_node;
+    }
+    else if (index >= list->len)
+    {
+        new_node->prev = list->tail;
         list->tail->next = new_node;
         list->tail = new_node;
-        goto ret;
     }
-
-    struct dlist_node *cur = list->head;
-    /* traverse from tail */
-    if (index >= list->len / 2)
-    {
-        cur = list->tail;
-        while (cur->index != index && cur->prev != NULL)
-            cur = cur->prev;
-    }
-    /* traverse from head */
     else
     {
-        cur = list->head;
-        while (cur->index != index && cur->next != NULL)
+        // dlist_node_t *cur = list->head;
+        // while (cur && index > 0)
+        // {
+        //     cur = cur->next;
+        //     index--;
+        // }
+
+        // new_node->prev = cur->prev;
+        // new_node->next = cur;
+        // cur->prev->next = new_node;
+        // cur->prev = new_node;
+
+        struct dlist_node *cur = NULL;
+        /* traverse from tail */
+        if (index <= list->len / 2)
+        {
+            cur = list->head;
+            while (cur->index != index && cur->next != NULL)
+                cur = cur->next;
+        }
+        /* traverse from head */
+        else
+        {
+            cur = list->tail;
+            while (cur->index != index && cur->prev != NULL)
+                cur = cur->prev;
+        }
+
+        new_node->next = cur->next;
+        new_node->prev = cur;
+        cur->next = new_node;
+
+        if (new_node->next)
+            new_node->next->prev = new_node;
+
+        while (cur->next != NULL)
+        {
+            ++cur->next->index;
             cur = cur->next;
+        }
     }
 
-    new_node->next = cur->next;
-    new_node->prev = cur;
-    cur->next = new_node;
-
-    while (cur->next != NULL)
-    {
-        ++cur->next->index;
-        cur = cur->next;
-    }
-
-    if (new_node->next == NULL)
-        list->tail = new_node;
-
-ret:
     ++list->len;
 }
 
@@ -201,7 +219,14 @@ void *dlist_at(struct dlist *list, size_t index)
     if (index >= list->len)
         index = list->len - 1;
 
-    struct dlist_node *cur = list->head;
+    // dlist_node_t *cur = list->head;
+    // while (cur && index > 0)
+    // {
+    //     cur = cur->next;
+    //     index--;
+    // }
+
+    struct dlist_node *cur = NULL;
     /* traverse from tail */
     if (index >= list->len / 2)
     {

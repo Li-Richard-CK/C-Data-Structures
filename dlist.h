@@ -77,6 +77,23 @@ space complexity: O(1)
 void *dlist_at(struct dlist *list, size_t index);
 
 /*
+dlist_at_cast(list, index, _t)
+
+retrieves data from 'index' of the doubly linked list and cast it to '_t' type
+this function will assume that if the index is greater than the length of the linked list
+to be the length of the list resulting in inserting at the end of the list
+it will also automatically decide the way(from head / tail) to traverse the linked list for
+optimization
+
+time complexity:
+worse-case: O(n)
+average: O(n / 2)
+best-case: O(1)
+space complexity: O(1)
+*/
+#define dlist_at_cast(list, index, _t) *((_t *)dlist_at((list), (index)))
+
+/*
 dlist_free(struct dlist *list)
 
 free memory allocated by the doubly linked list
