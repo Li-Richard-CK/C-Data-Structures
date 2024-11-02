@@ -124,23 +124,27 @@ void dlist_insert(struct dlist *list, const void *data, size_t index)
 
     new_node->index = index;
 
+    /* set the head of the list */
     if (!list->head)
     {
         list->head = new_node;
         list->tail = new_node;
     }
+    /* insert as head */
     else if (index == 0)
     {
         new_node->next = list->head;
         list->head->prev = new_node;
         list->head = new_node;
     }
+    /* insert at tail */
     else if (index >= list->len)
     {
         new_node->prev = list->tail;
         list->tail->next = new_node;
         list->tail = new_node;
     }
+    /* anywhere in between */
     else
     {
         // dlist_node_t *cur = list->head;
@@ -178,6 +182,7 @@ void dlist_insert(struct dlist *list, const void *data, size_t index)
         if (new_node->next)
             new_node->next->prev = new_node;
 
+        /* update index of the nodes */
         while (cur->next != NULL)
         {
             ++cur->next->index;
