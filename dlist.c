@@ -156,14 +156,14 @@ void dlist_insert(struct dlist *list, const void *data, size_t index)
         // cur->prev = new_node;
 
         struct dlist_node *cur = NULL;
-        /* traverse from tail */
+        /* traverse from head */
         if (index <= list->len / 2)
         {
             cur = list->head;
             while (cur->index != index && cur->next != NULL)
                 cur = cur->next;
         }
-        /* traverse from head */
+        /* traverse from tail */
         else
         {
             cur = list->tail;
@@ -227,19 +227,20 @@ void *dlist_at(struct dlist *list, size_t index)
     // }
 
     struct dlist_node *cur = NULL;
-    /* traverse from tail */
-    if (index >= list->len / 2)
-    {
-        cur = list->tail;
-        while (cur->index != index && cur->prev != NULL)
-            cur = cur->prev;
-    }
+
     /* traverse from head */
-    else
+    if (index <= list->len / 2)
     {
         cur = list->head;
         while (cur->index != index && cur->next != NULL)
             cur = cur->next;
+    }
+    /* traverse from tail */
+    else
+    {
+        cur = list->tail;
+        while (cur->index != index && cur->prev != NULL)
+            cur = cur->prev;
     }
 
     return cur->data;
