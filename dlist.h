@@ -18,6 +18,21 @@ typedef struct dlist
     } mm;
 } dlist_t;
 
-struct dlist dlist_create();
+/*
+dlist_create(void)
+
+creates a new doubly linked list
+
+return:
+newly created doubly linked list
+
+time complexity: O(1)
+space complexity: O(1)
+*/
+struct dlist dlist_create(void);
+
+void dlist_insert(struct dlist *list, const void *data, size_t index);
+
+void dlist_free(struct dlist *list);
 
 #endif
