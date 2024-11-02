@@ -32,6 +32,16 @@ space complexity: O(1)
 struct dlist dlist_create(void);
 
 /*
+dlist_is_empty(struct dlist *list)
+
+returns if 'list' is empty
+
+time complexity: O(1)
+space complexity: O(1)
+*/
+int dlist_is_empty(struct dlist *list);
+
+/*
 dlist_insert(struct dlist *list, const void *data, size_t index)
 
 inserts 'data' into 'index' of the doubly linked list
@@ -48,6 +58,23 @@ best-case: O(1)
 space complexity: O(1)
 */
 void dlist_insert(struct dlist *list, const void *data, size_t index);
+
+/*
+dlist_at(struct dlist *list, size_t index)
+
+retrieves data from 'index' of the doubly linked list
+this function will assume that if the index is greater than the length of the linked list
+to be the length of the list resulting in inserting at the end of the list
+it will also automatically decide the way(from head / tail) to traverse the linked list for
+optimization
+
+time complexity:
+worse-case: O(n)
+average: O(n / 2)
+best-case: O(1)
+space complexity: O(1)
+*/
+void *dlist_at(struct dlist *list, size_t index);
 
 /*
 dlist_free(struct dlist *list)

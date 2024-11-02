@@ -71,6 +71,19 @@ struct dlist dlist_create(void)
 }
 
 /*
+dlist_is_empty(struct dlist *list)
+
+returns if 'list' is empty
+
+time complexity: O(1)
+space complexity: O(1)
+*/
+int dlist_is_empty(struct dlist *list)
+{
+    return (list->head) ? 1 : 0;
+}
+
+/*
 dlist_insert(struct dlist *list, const void *data, size_t index)
 
 inserts 'data' into 'index' of the doubly linked list
@@ -88,6 +101,17 @@ space complexity: O(1)
 */
 void dlist_insert(struct dlist *list, const void *data, size_t index)
 {
+    if (!list)
+    {
+        fprintf(stderr, "'list' cannot be empty.\n");
+        return;
+    }
+    if (!list->mm.alloc_f)
+    {
+        fprintf(stderr, "'alloc_f' cannot be empty.\n");
+        return;
+    }
+
     if (index > list->len)
         index = list->len;
 
@@ -147,6 +171,56 @@ ret:
 }
 
 /*
+dlist_at(struct dlist *list, size_t index)
+
+retrieves data from 'index' of the doubly linked list
+this function will assume that if the index is greater than the length of the linked list
+to be the length of the list resulting in inserting at the end of the list
+it will also automatically decide the way(from head / tail) to traverse the linked list for
+optimization
+
+time complexity:
+worse-case: O(n)
+average: O(n / 2)
+best-case: O(1)
+space complexity: O(1)
+*/
+void *dlist_at(struct dlist *list, size_t index)
+{
+    if (!list)
+    {
+        fprintf(stderr, "'list' cannot be empty.\n");
+        return NULL;
+    }
+    if (!dlist_is_empty(list))
+    {
+        fprintf(stderr, "'list' is empty.\n");
+        return NULL;
+    }
+
+    if (index >= list->len)
+        index = list->len - 1;
+
+    struct dlist_node *cur = list->head;
+    /* traverse from tail */
+    if (index >= list->len / 2)
+    {
+        cur = list->tail;
+        while (cur->index != index && cur->prev != NULL)
+            cur = cur->prev;
+    }
+    /* traverse from head */
+    else
+    {
+        cur = list->head;
+        while (cur->index != index && cur->next != NULL)
+            cur = cur->next;
+    }
+
+    return cur->data;
+}
+
+/*
 dlist_free(struct dlist *list)
 
 free memory allocated by the doubly linked list
@@ -157,6 +231,17 @@ space complexity: O(1)
 */
 void dlist_free(struct dlist *list)
 {
+    if (!list)
+    {
+        fprintf(stderr, "'list' cannot be empty.\n");
+        return;
+    }
+    if (!list->mm.alloc_f)
+    {
+        fprintf(stderr, "'alloc_f' cannot be empty.\n");
+        return;
+    }
+
     struct dlist_node *cur, *next;
     cur = list->head;
     next = NULL;
