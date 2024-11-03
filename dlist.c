@@ -233,6 +233,26 @@ space complexity: O(1)
 */
 void *dlist_at(struct dlist *list, size_t index)
 {
+    return dlist_at_node(list, index)->data;
+}
+
+/*
+dlist_at_node(struct dlist *list, size_t index)
+
+retrieves node of 'index'
+this function will assume that if the index is greater than the length of the linked list
+to be the length of the list resulting in inserting at the end of the list
+it will also automatically decide the way(from head / tail) to traverse the linked list for
+optimization
+
+time complexity:
+worse-case: O(n)
+average: O(n / 2)
+best-case: O(1)
+space complexity: O(1)
+*/
+struct dlist_node *dlist_at_node(struct dlist *list, size_t index)
+{
     if (!list)
     {
         fprintf(stderr, "'list' cannot be empty.\n");
@@ -278,7 +298,7 @@ void *dlist_at(struct dlist *list, size_t index)
         }
     }
 
-    return cur->data;
+    return cur;
 }
 
 /*
@@ -359,6 +379,69 @@ void dlist_erase(struct dlist *list, size_t start, size_t end)
         ++start;
         --list->len;
     }
+}
+
+/*
+dlist_swap(struct dlist *list, size_t index0, size_t index1)
+
+swap the node of 'index0' and 'index1'
+
+time complexity:
+worse-case: O(n)
+average: O(n)
+best-case: O(1)
+space complexity: O(1)
+*/
+void dlist_swap(struct dlist *list, size_t index0, size_t index1)
+{
+    if (!list)
+    {
+        fprintf(stderr, "'list' cannot be empty.\n");
+        return;
+    }
+    if (dlist_is_empty(list))
+    {
+        fprintf(stderr, "'list' is empty.\n");
+        return;
+    }
+    if (index0 >= list->len || index1 >= list->len)
+    {
+        fprintf(stderr, "index out of bounds.\n");
+        return;
+    }
+    if (index0 == index1)
+        return;
+
+    struct dlist_node *node0 = dlist_at_node(list, index0);
+    struct dlist_node *node1 = dlist_at_node(list, index1);
+
+    struct dlist_node *tmp = node0->prev;
+    node0->prev = node1->prev;
+    node1->prev = tmp;
+
+    tmp = node0->next;
+    node0->next = node1->next;
+    node1->next = tmp;
+
+    if (node0->prev)
+        node0->prev->next = node0;
+    else
+        list->head = node0;
+
+    if (node0->next)
+        node0->next->prev = node0;
+    else
+        list->tail = node0;
+
+    if (node1->prev)
+        node1->prev->next = node1;
+    else
+        list->head = node1;
+
+    if (node1->next)
+        node1->next->prev = node1;
+    else
+        list->tail = node1;
 }
 
 /*

@@ -87,6 +87,23 @@ space complexity: O(1)
 void *dlist_at(struct dlist *list, size_t index);
 
 /*
+dlist_at_node(struct dlist *list, size_t index)
+
+retrieves node of 'index'
+this function will assume that if the index is greater than the length of the linked list
+to be the length of the list resulting in inserting at the end of the list
+it will also automatically decide the way(from head / tail) to traverse the linked list for
+optimization
+
+time complexity:
+worse-case: O(n)
+average: O(n / 2)
+best-case: O(1)
+space complexity: O(1)
+*/
+struct dlist_node *dlist_at_node(struct dlist *list, size_t index);
+
+/*
 dlist_at_cast(list, index, _t)
 
 retrieves data from 'index' of the doubly linked list and cast it to '_t' type
@@ -119,6 +136,19 @@ best-case: O(1)
 space complexity: O(1)
 */
 void dlist_erase(struct dlist *list, size_t start, size_t end);
+
+/*
+dlist_swap(struct dlist *list, size_t index0, size_t index1)
+
+swap the node of 'index0' and 'index1'
+
+time complexity:
+worse-case: O(n)
+average: O(n)
+best-case: O(1)
+space complexity: O(1)
+*/
+void dlist_swap(struct dlist *list, size_t index0, size_t index1);
 
 /*
 dlist_free(struct dlist *list)

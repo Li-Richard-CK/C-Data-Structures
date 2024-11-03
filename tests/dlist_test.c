@@ -44,6 +44,8 @@ int main(int argc, char *argv[])
 
     dlist_erase(&list, 5, 9);
 
+    dlist_swap(&list, 0, list.len - 1);
+
     printf("\n");
     for (int i = 0; i < list.len; ++i)
     {
