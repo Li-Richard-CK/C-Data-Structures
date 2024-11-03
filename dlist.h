@@ -104,6 +104,23 @@ space complexity: O(1)
 #define dlist_at_cast(list, index, _t) *((_t *)dlist_at((list), (index)))
 
 /*
+dlist_erase(struct dlist *list, size_t start, ...)
+
+erase the nodes of index 'start' and end 1 index before 'end'
+it will delete 'end' - 'start' amount of elements
+if only starting index is passed then it only erase node of index 'start'
+it will also automatically decide the way(from head / tail) to traverse the linked list to
+find the starting node for optimization
+
+time complexity:
+worse-case: O(n + M)
+average: O(n / 2 + M)
+best-case: O(1)
+space complexity: O(1)
+*/
+void dlist_erase(struct dlist *list, size_t start, size_t end);
+
+/*
 dlist_free(struct dlist *list)
 
 free memory allocated by the doubly linked list

@@ -15,7 +15,6 @@ struct dlist_node
     void *data;
 
     struct dlist_node *next, *prev;
-    size_t index;
 };
 
 static struct dlist_node *_create_node(void *(*alloc_f)(size_t), const void *data)
@@ -38,9 +37,30 @@ static struct dlist_node *_create_node(void *(*alloc_f)(size_t), const void *dat
 
     new_node->next = NULL;
     new_node->prev = NULL;
-    new_node->index = 0;
 
     return new_node;
+}
+
+static void _free_node(struct dlist_node *node, void (*free_f)(void *))
+{
+    if (!node)
+    {
+        fprintf(stderr, "'node' cannot be empty.\n");
+        return;
+    }
+    if (!free_f)
+    {
+        fprintf(stderr, "'free_f' cannot be empty.\n");
+        return;
+    }
+
+    if (node->prev)
+        node->prev->next = node->next;
+    if (node->next)
+        node->next->prev = node->prev;
+
+    free_f(node->data);
+    free_f(node);
 }
 
 /*
@@ -80,7 +100,7 @@ space complexity: O(1)
 */
 int dlist_is_empty(struct dlist *list)
 {
-    return (list->head) ? 1 : 0;
+    return (list->head) ? 0 : 1;
 }
 
 /*
@@ -122,8 +142,6 @@ void dlist_insert(struct dlist *list, const void *data, size_t index)
     if (index > list->len)
         index = list->len;
 
-    new_node->index = index;
-
     /* set the head of the list */
     if (!list->head)
     {
@@ -160,19 +178,27 @@ void dlist_insert(struct dlist *list, const void *data, size_t index)
         // cur->prev = new_node;
 
         struct dlist_node *cur = NULL;
+        size_t cur_index = 0;
         /* traverse from head */
         if (index <= list->len / 2)
         {
             cur = list->head;
-            while (cur->index != index && cur->next != NULL)
+            while (cur_index != index && cur->next != NULL)
+            {
                 cur = cur->next;
+                ++cur_index;
+            }
         }
         /* traverse from tail */
         else
         {
+            cur_index = list->len - 1;
             cur = list->tail;
-            while (cur->index != index && cur->prev != NULL)
+            while (cur_index != index && cur->prev != NULL)
+            {
                 cur = cur->prev;
+                --cur_index;
+            }
         }
 
         new_node->next = cur->next;
@@ -184,10 +210,7 @@ void dlist_insert(struct dlist *list, const void *data, size_t index)
 
         /* update index of the nodes */
         while (cur->next != NULL)
-        {
-            ++cur->next->index;
             cur = cur->next;
-        }
     }
 
     ++list->len;
@@ -215,7 +238,7 @@ void *dlist_at(struct dlist *list, size_t index)
         fprintf(stderr, "'list' cannot be empty.\n");
         return NULL;
     }
-    if (!dlist_is_empty(list))
+    if (dlist_is_empty(list))
     {
         fprintf(stderr, "'list' is empty.\n");
         return NULL;
@@ -232,23 +255,110 @@ void *dlist_at(struct dlist *list, size_t index)
     // }
 
     struct dlist_node *cur = NULL;
-
+    size_t cur_index = 0;
     /* traverse from head */
     if (index <= list->len / 2)
     {
         cur = list->head;
-        while (cur->index != index && cur->next != NULL)
+        while (cur_index != index && cur->next != NULL)
+        {
             cur = cur->next;
+            ++cur_index;
+        }
     }
     /* traverse from tail */
     else
     {
+        cur_index = list->len - 1;
         cur = list->tail;
-        while (cur->index != index && cur->prev != NULL)
+        while (cur_index != index && cur->prev != NULL)
+        {
             cur = cur->prev;
+            --cur_index;
+        }
     }
 
     return cur->data;
+}
+
+/*
+dlist_erase(struct dlist *list, size_t start, ...)
+
+erase the nodes of index 'start' and end 1 index before 'end'
+it will delete 'end' - 'start' amount of elements
+if only starting index is passed then it only erase node of index 'start'
+it will also automatically decide the way(from head / tail) to traverse the linked list to
+find the starting node for optimization
+
+time complexity:
+worse-case: O(n + M)
+average: O(n / 2 + M)
+best-case: O(1)
+space complexity: O(1)
+*/
+void dlist_erase(struct dlist *list, size_t start, size_t end)
+{
+    if (!list)
+    {
+        fprintf(stderr, "'list' cannot be empty.\n");
+        return;
+    }
+    if (dlist_is_empty(list))
+    {
+        fprintf(stderr, "'list' is empty.\n");
+        return;
+    }
+
+    if (start > end)
+    {
+        fprintf(stderr, "'start' cannot be greater than 'end'.\n");
+        return;
+    }
+
+    if (start == end)
+        ++end;
+
+    /* find the starting node */
+    struct dlist_node *cur = NULL;
+    size_t cur_index = 0;
+    /* traverse from head */
+    if (start <= list->len / 2)
+    {
+        cur = list->head;
+        while (cur_index != start && cur->next != NULL)
+        {
+            cur = cur->next;
+            ++cur_index;
+        }
+    }
+    /* traverse from tail */
+    else
+    {
+        cur_index = list->len - 1;
+        cur = list->tail;
+        while (cur_index != start && cur->prev != NULL)
+        {
+            cur = cur->prev;
+            --cur_index;
+        }
+    }
+
+    while (start < end)
+    {
+        struct dlist_node *next = cur->next;
+        /* update head */
+        if (cur_index == 0)
+            list->head = cur->next;
+        /* update tail */
+        if (cur_index == list->len - 1)
+            list->tail = cur->prev;
+
+        _free_node(cur, list->mm.free_f);
+
+        cur = next;
+        ++start;
+        --list->len;
+    }
 }
 
 /*
