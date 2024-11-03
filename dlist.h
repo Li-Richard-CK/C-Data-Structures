@@ -108,7 +108,7 @@ dlist_erase(struct dlist *list, size_t start, ...)
 
 erase the nodes of index 'start' and end 1 index before 'end'
 it will delete 'end' - 'start' amount of elements
-if only starting index is passed then it only erase node of index 'start'
+if 'start' and 'end' is the same then the function will automatically call '++end'
 it will also automatically decide the way(from head / tail) to traverse the linked list to
 find the starting node for optimization
 
